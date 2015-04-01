@@ -27,9 +27,7 @@ From these "extreme load episodes", a subset of 20 episodes was selected (from s
 
 Below we describe briefly the format of the data files composing the dataset:
 
-_TODO: Complete this!_
-
-## JDC2014-SessionX-eyetracking-eventexport.txt (in JDC2014-EyetrackingData.zip)
+## ISL2014BASELINE-SessionX-eyetracking-eventexport.txt (in ISL2014BASELINE-EyetrackingData.zip)
 
 Comma-separated value file (separator=",", comments="#", with headers). This is the raw eye measures time series as exported using BeGaze software. It has the following fields:
 
@@ -64,7 +62,7 @@ Comma-separated value file (separator=",", comments="#", with headers). This is 
 * Aux1 : empty field
 * B Event Info: type of event ( - | Saccade | Fixation | Blink )
 
-## JDC2014-SessionX-eyetracking-fixationDetails.txt (in JDC2014-EyetrackingData.zip)
+## ISL2014BASELINE-SessionX-eyetracking-fixationDetails.txt (in ISL2014BASELINE-EyetrackingData.zip)
 
 Comma-separated value file (separator=",", with headers). This is the export of the main fixation statistics, taken from the "Fixation details" section of BeGaze's Event Statistics (each row is a detected fixation). It has the following fields:
 
@@ -89,7 +87,7 @@ Comma-separated value file (separator=",", with headers). This is the export of 
 * Number : fixation number (number, from 1 to the number of fixations in the session)
 
 
-## JDC2014-SessionX-eyetracking-saccadeDetails.txt (in JDC2014-EyetrackingData.zip)
+## ISL2014BASELINE-SessionX-eyetracking-saccadeDetails.txt (in ISL2014BASELINE-EyetrackingData.zip)
 
 Comma-separated value file (separator=",", with headers). This is the export of the main saccade statistics, taken from the "Saccade details" section of BeGaze's Event Statistics (each row is a detected saccade). It has the following fields:
 
@@ -119,20 +117,22 @@ Comma-separated value file (separator=",", with headers). This is the export of 
 * Number : fixation number (number, from 1 to the number of fixations in the session)
 
 
-## JDC2014-SessionX-videocoding.csv (in JDC2014-VideoCodingData.zip)
+## ISL2014BASELINE-videocoding.csv (in ISL2014BASELINE-VideoCodingData.zip)
 
 Comma-separated value file (separator=",", with headers), with the video codes assigned to different 10-second episodes by a single researcher/coder, along three main dimensions (only one code from each dimensions is assigned to an episode):
 
+_TODO: revise the concrete video codes that appear_
+
 Orchestration dimension | Teacher activity | Social plane | Main gaze focus
 ------------------------|------------------|--------------|----------------
-Example codes | Explanation/Lecturing (EXP), Monitoring (MON), Task distribution or transition (TDT), Technical or conceptual repairs, i.e., solving student questions (REP) | Small group (G), Class-wide (C) | Students’ faces (FAC) or backs (BAK), Tabletop surface (TAB), Teacher desk with manipulatives to distribute (MD), Classroom's whiteboard (W), Additional researchers/facilitators (RES), Single paper manipulatives not on the tabletop (M)
+Example codes | Explanation/Lecturing (EXP), Monitoring (MON), Task distribution or transition (TDT), Technical or conceptual repairs, i.e., solving student questions (REP) | Individual (IND), Small group (GRP), Class-wide (CLS) | Students’ faces (FAC) or backs (BAK), Tabletop surface (TAB), Teacher desk with manipulatives to distribute (MD), Classroom's whiteboard (W), Additional researchers/facilitators (RES), Single paper manipulatives not on the tabletop (M)
 
 The file has the following fields:
 
 * time : timestamp marking the middle-point of the 10-second window of the episode (number)
 * Time.min : timestamp, in minutes/seconds, marking the middle-point of the episode (e.g., "2m50s")
-* Session : session identifier ( JDC2014-Session1-eyetracking | JDC2014-Session2-eyetracking | JDC2014-Session3-eyetracking )
+* Session : session identifier ( ISL2014BASELINE-Session1-eyetracking | ISL2014BASELINE-Session2-eyetracking )
 * Short.description : short qualitative description of what is going on during the episode (character)
 * Activity : code along the teacher activity dimension ( EXP | MON | TDT | REP )
-* Social : code along the social plane of interaction dimension ( C | G )
+* Social : code along the social plane of interaction dimension ( IND | CLS | GRP )
 * Focus : code along the main focus of gaze dimension ( FAC | TAB | BAK | RES | MD | W | M )
