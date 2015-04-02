@@ -49,6 +49,7 @@ source("./lib/extremeLoadExtraction.R")
 source("./lib/aggregateEpisodeData.R")
 source("./lib/generateLoadGraphs.R")
 source("./lib/generateVideoSnippetScript.R")
+source("./lib/codeCount.R")
 
 rootdir <- getwd()
 # If not present already, download dataset and uncompress it
@@ -158,9 +159,30 @@ Thus, we found that the _teacher's subjective ratings were significantly lower f
 
 We can also look at the qualitative analysis of remarks done by the teacher during this think-aloud protocol (see the ```ISL2014BASELINE-stimulatedrecall-audiocoding.csv``` datafile):
 
-```{r}
+```{r, fig.height=6, fig.width=24, warning=FALSE, message=FALSE}
 audiocoding <- read.csv(paste(rootdir,"/data/ISL2014BASELINE-stimulatedrecall-audiocoding.csv",sep=""),sep=";")
-# TODO: How to show clearly code counts of multiple codes per episode?
+codecount <- codeCount(audiocoding)
+
+# We plot the different code occurrences, regarding the load from eyetracking, to see contrasts among them
+tabEye <- table(codecount$Code, codecount$Eyetrack.Load)
+countsEye <- melt(tabEye, varnames=c("Code","Eyetrack.Load"))
+ggplot(countsEye,aes(x=Code,y=value,fill=factor(Eyetrack.Load, levels=c("4","0"))))+
+    geom_bar(stat="identity",position="dodge")+
+    xlab("Codes/Themes")+
+    ylab("# appearances")+
+    ggtitle("Code counts for high and low eyetracking load")
+
+# Given the small spread of subjective load values, we create 3 categories: 
+# low (1-2), mid-high (3-4)
+codecount$Subj.Category <- cut(codecount$Subj.Load,breaks=c(-Inf,2.01,Inf))
+tabSubj <- table(codecount$Code, codecount$Subj.Category)
+countsSubj <- melt(tabSubj, varnames=c("Code","Subj.Category"))
+ggplot(countsSubj,aes(x=Code,y=value,fill=Subj.Category))+
+    geom_bar(stat="identity",position="dodge")+
+    xlab("Codes/Themes")+
+    ylab("# appearances")+
+    ggtitle("Code counts for high and low subjective load")+
+    scale_fill_manual(values=c('green','red'))
 ```
 
 Thus, we can see that in the higher-load episodes (both subjective and based on eye-tracking) teacher often mentions attempts to model students' understanding, or the need to take a decision about what would be the best immediate course of action. On the other hand, in lower-load episodes (from subjective rating and eye-tracking index), the individual explanations after a student error (what we could term `repairs'), and the technical details or problems in using the technological tools appear more often. Interestingly, the need to make the lesson progress according to plan (i.e., be within the time/curriculum constraints) appears very often in high-load moments, but also appears in low-load ones (maybe indicating a background concern at all times, even in the lower-load moments).
