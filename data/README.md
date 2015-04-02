@@ -10,7 +10,7 @@ This dataset has been used in several scientific works, such as the [ECTEL 2015]
 Aside from this README.md file, the dataset is composed of three zip archives:
 
 * ISL2014BASELINE-EyetrackingData.zip : Contains the raw datasets from the mobile eyetracker that the teacher was wearing, including eye measures time series, fixation and saccade details (as extracted using SMI's BeGaze 3.4 software).
-* ISL2014BASELINE-VideoCodingData.zip : Contains the codes from the manual video coding, by a single researcher, of the 10-second episodes in which the "load index" calculated from eyetracking metrics (see the [ECTEL2015 paper report](https://github.com/chili-epfl/ectel2015-orchestration-school)) had extreme low/high values.
+* ISL2014BASELINE-CodingData.zip : Contains the codes from the manual video coding, by a single researcher, of the 10-second episodes in which the "load index" calculated from eyetracking metrics (see the [ECTEL2015 paper report](https://github.com/chili-epfl/ectel2015-orchestration-school)) had extreme low/high values.
 * ISL2014BASELINE-QuestionnaireData.zip : Contains the quantitative and qualitative data from questionnaires: subjective ratings of session workload performed just after the sessions, and "stimulated recall" rating (including semi-transcription and coding of the think-aloud protocol followed) of workload of selected episodes from the sessions. See the method section below for further details.
 
 # Data gathering context and method
@@ -117,7 +117,7 @@ Comma-separated value file (separator=",", with headers). This is the export of 
 * Number : fixation number (number, from 1 to the number of fixations in the session)
 
 
-## ISL2014BASELINE-videocoding.csv (in ISL2014BASELINE-VideoCodingData.zip)
+## ISL2014BASELINE-videocoding.csv (in ISL2014BASELINE-CodingData.zip)
 
 Comma-separated value file (separator=",", with headers), with the video codes assigned to different 10-second episodes by a single researcher/coder, along three main dimensions (only one code from each dimensions is assigned to an episode):
 
