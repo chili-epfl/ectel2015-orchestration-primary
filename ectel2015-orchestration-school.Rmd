@@ -56,7 +56,9 @@ rootdir <- getwd()
 setwd(paste(rootdir,"/data",sep=""))
 # TODO: complete once the datasets are uploaded
 # if(!file.exists())...
-# unzip/bz2...
+unzip("ISL2014BASELINE-EyetrackingData.zip")
+unzip("ISL2014BASELINE-QuestionnaireData.zip")
+unzip("ISL2015BASELINE-CodingData.zip")
 ```
 
 We now have all the datafiles uncompressed. This includes mainly a time series of eyetracking data for each of the two sessions, plus an additional set of files with the fixation details and saccade details of each session. There is also another file with the video-codes assigned to a fraction of the of 10-second episodes (those with extreme load indices), as coded by a single human researcher, following the three-dimension video coding scheme mentioned above. The raw gaze video data itself has not been made available due to anonymity reasons. 
@@ -74,7 +76,7 @@ cleandatafile <- "ISL2014BASELINE-AggregatedEyetrackData.Rda"
 sessions <- c("ISL2014BASELINE-Session1-eyetracking","ISL2014BASELINE-Session2-eyetracking")
 eyetrackdata <- data.frame();
 if(!file.exists(paste(rootdir,"/data/",cleandatafile,sep=""))){    
-    eyetrackdata <- aggregateEpisodeData(sessions)
+    eyetrackdata <- aggregateEpisodeData(sessions, datadir=paste(rootdir,"/data",sep=""))
 }else{
     eyetrackdata <- get(load(paste(rootdir,"/data/",cleandatafile,sep="")))
 }
