@@ -152,7 +152,7 @@ data <- merge(subjdata,eyedata,by=c("Session","Snippet"))
 plotmeans(Subjective.Value ~ Load, data=data)
 
 # We check the significance of this difference
-# TODO: Ask Kshitij about this one
+anova(lm(data$Subjective.Value~data$Load))
 ```
 
 Thus, we found that the _teacher's subjective ratings were significantly lower for the low load episodes_ than those for the high load episodes. This supports the idea that the teacher's notions of her own cognitive load coincide somehow with the physiological data from eye-tracking.
@@ -190,14 +190,197 @@ Thus, we can see that in the higher-load episodes (both subjective and based on 
 
 ## 3. Objective episode analysis (video coding)
 
+From the eyetracking load index, we extracted the extreme load episodes (10-second episodes with an eye-tracking load index of 0 or 4), for manual coding of the subjective video feed by a researcher (see the ```./lib/extremeLoadExtraction.R``` file).
+
+```{r, warning=FALSE}
+outputfile <- paste(rootdir,"/data/TimesToVideoCode.csv",sep="")
+extremedata <- extractExtremeLoadMoments(sessions, loaddata, outputfile)
+```
+
+We manually coded the videos of all these extreme load episodes, along the dimensions of teacher activity, social plane of the interaction and main focus of gaze (see the ```ISL2014BASELINE-videocoding.csv``` datafile). We then aggregate the code counts for each of these dimensions in a session, to bridge from the episode-level analysis to have an idea of what kind of episodes are often high or low load. 
+
+```{r, warning=FALSE}
+videodata <- read.csv(paste(rootdir,"/data/ISL2014BASELINE-videocoding.csv",sep=""))
+
+videocodeddata <- merge(loaddata,videodata,by = c("Session","time"), all = T)
+
+# We ensure that the load and video coded variables are factors, for later analysis, and eliminate any levels of the factor not used,
+# and keep only the extreme load cases (in the dataset there are codes for some non-extreme values too)
+videocodeddata <- videocodeddata[complete.cases(videocodeddata) & (videocodeddata$Load == 4 | videocodeddata$Load == 0),]
+videocodeddata$Load <- as.factor(videocodeddata$Load)
+```
+
+### Overall
+
+```{r, warning=FALSE}
+videocodeddata$Activity <- factor(videocodeddata$Activity)
+videocodeddata$Social <- factor(videocodeddata$Social)
+videocodeddata$Focus <- factor(videocodeddata$Focus)
+
+# chi-squared test and counts/residuals table for teacher activity
+tabAct <- table(videocodeddata$Load,videocodeddata$Activity)
+chisq.test(tabAct)
+tabAct
+chisq.test(tabAct)$residuals
+
+# chi-squared test and counts/residuals table for social plane of interaction
+# We merge individual and group social planes, as they are largely equivalent in the context of these sessions
+levels(videocodeddata$Social) = c("CLS","GRPIND","GRPIND")
+tabSoc <- table(videocodeddata$Load,videocodeddata$Social)
+chisq.test(tabSoc)
+tabSoc
+chisq.test(tabSoc)$residuals
+
+# chi-squared test and counts/residuals table for main focus of gaze
+tabFoc <- table(videocodeddata$Load,videocodeddata$Focus)
+chisq.test(tabFoc)
+tabFoc
+chisq.test(tabFoc)$residuals
+```
+
+
+### Session 1
+
+
+```{r, warning=FALSE}
+# For each session, we look into the video codes
+session <- sessions[1]
+
+sessiondata <- videocodeddata[videocodeddata$Session == session,]
+sessiondata$Activity <- factor(sessiondata$Activity)
+sessiondata$Social <- factor(sessiondata$Social)
+sessiondata$Focus <- factor(sessiondata$Focus)
+
+# chi-squared test and counts/residuals table for teacher activity
+tabAct <- table(sessiondata$Load,sessiondata$Activity)
+chisq.test(tabAct)
+tabAct
+chisq.test(tabAct)$residuals
+
+# chi-squared test and counts/residuals table for social plane of interaction
+# We merge individual and group social planes, as they are largely equivalent in the context of these sessions
+#levels(sessiondata$Social) = c("CLS","GRPIND","GRPIND")
+tabSoc <- table(sessiondata$Load,sessiondata$Social)
+chisq.test(tabSoc)
+tabSoc
+chisq.test(tabSoc)$residuals
+
+# chi-squared test and counts/residuals table for main focus of gaze
+tabFoc <- table(sessiondata$Load,sessiondata$Focus)
+chisq.test(tabFoc)
+tabFoc
+chisq.test(tabFoc)$residuals
+```
+
+### Session 2
+
+```{r, warning=FALSE}
+# For each session, we look into the video codes
+session <- sessions[2]
+
+sessiondata <- videocodeddata[videocodeddata$Session == session,]
+sessiondata$Activity <- factor(sessiondata$Activity)
+sessiondata$Social <- factor(sessiondata$Social)
+sessiondata$Focus <- factor(sessiondata$Focus)
+
+# chi-squared test and counts/residuals table for teacher activity
+tabAct <- table(sessiondata$Load,sessiondata$Activity)
+chisq.test(tabAct)
+tabAct
+chisq.test(tabAct)$residuals
+
+# chi-squared test and counts/residuals table for social plane of interaction
+# We merge individual and group social planes, as they are largely equivalent in the context of these sessions
+#levels(sessiondata$Social) = c("CLS","GRPIND","GRPIND")
+tabSoc <- table(sessiondata$Load,sessiondata$Social)
+chisq.test(tabSoc)
+tabSoc
+chisq.test(tabSoc)$residuals
+
+# chi-squared test and counts/residuals table for main focus of gaze
+tabFoc <- table(sessiondata$Load,sessiondata$Focus)
+chisq.test(tabFoc)
+tabFoc
+chisq.test(tabFoc)$residuals
+```
+
+We can find several _common trends_ in the orchestration load episode profiles of the two sessions: 
+
+* In all three dimensions, the differences between high-load and low-load episodes were statistically significant
+* The high-load episodes are characterised by the teacher giving explanations/lecturing (EXP) and asking questions (QUE); the social plane being whole-class (CLS); and the main focus of the teacher being the faces of the students (FAC).
+* On the other hand, low-load episodes in both sessions are characterised by the teacher doing 'repairs' (REP -- i.e., solving a question or misunderstanding of a student) more often; the social plane being individual (IND); and the main focus of the teacher being the activity paper sheets of the students (PAP).
+
+By looking at the video codes, however, we can also detect a few _differences between the two sessions_. Compared to the first session, in the second session we can see the appearance of a new category of episodes (disciplinary remarks, DISC), in the high-load episodes. Also, we can observe that the significance of differences in several of the video codes is increased for the second session: the predominance of repairs in low-load episodes, higher appearance of focus on paper worksheets in low-load episodes as well as the relative absence of focus on the students' laptops on high-load episodes.
 
 ## 4. Session-level analysis
 
+Moving onto the overall session-level cognitive load analysis (and the eventual comparison between the two sessions), we can take a look at the subjective ratings provided by the teacher at the end of each session. 
 
-## Summary of results
+```{r}
+sessionrating <- read.csv(paste(rootdir,"/data/ISL2014BASELINE-sessionratings.csv",sep=""),sep=";")
+print(sessionrating[,c("Session","Subj.Mental.Effort","Subj.Difficulty")])
+```
 
-TODO 
+In both cases the teacher assessed the overall load as involving `some mental effort' (6 in a scale of 1-9 in the standard subjective mental effort scale). The teacher, however, considered the second session as slightly more difficult to manage (6 vs. 5 out of 9). 
 
-## Conclusions
+This perception can be expanded by looking at the teacher's responses to the TLX questionnaire about the sessions workload: 
 
-TODO
+```{r}
+print(sessionrating[,3:14])
+```
+
+In both cases responses were quite similar (overall workload scores of 53.3 and 56.3 out of 100). However, by looking at the scores and weighting of the different workload components (mental, temporal or physical demands, performance, effort and frustration), we see that in session 2 the value and weighting of the 'frustration' component were much higher, which also accounts for the larger part of the increase in overall perceived workload. 
+
+```{r,message=FALSE}
+# We print the especially difficult moment remarks
+print(as.character(sessionrating[,17]))
+# We print the especially easy moment remarks
+print(as.character(sessionrating[,18]))
+```
+
+The qualitative (open) responses about self-perceived high-load episodes were also quite similar in both sessions, referring to worries about student progress. However, we can find that only in the second session the teacher referred to the aforementioned disciplinary concerns, which may help explain the higher frustration component of that session.
+
+To triangulate this perception with more objective data, we can also look at the eye-tracking measures. If we apply the median values of the four eye-tracking measures of interest (after normalization by the first 10-second episode of each session, to account for variability in the data due to the different time of the day or wakefulness of the teacher in the concerned days) of session 2 to the data in session 1, we can obtain a quantitative approximation to the relative difficulty between the two sessions. 
+
+```{r, message=FALSE, warning=FALSE}
+# TODO: Recalculate the load index with different median
+
+# We do a basic histogram of the amount episodes regarding their Load Index of each session, 
+# using its session median to perform the cut (and normalized by the number of episodes in each session)
+loadtabSelf <- table(loaddata$Load, loaddata$Session)
+countsDataSelf <- melt(loadtabSelf, varnames=c("Load","Session"))
+countsDataSelf$num.Episodes <- numeric(nrow(countsDataSelf))
+for(session in sessions){
+     countsDataSelf[countsDataSelf$Session == session,"num.Episodes"] <- sum(countsDataSelf[countsDataSelf$Session == session , "value"])
+}
+# We change the values of the session to something shorter, for aesthetic reasons
+countsDataSelf$Session <- mapvalues(countsDataSelf$Session, from = sessions, to = c("Session 1", "Session 2"))
+# We draw the plot of count proportions for the load index
+ggplot(countsDataSelf,aes(x=Load,y=value/num.Episodes,fill=Session))+
+    geom_bar(stat="identity",position="dodge")+
+    theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=15),
+        legend.text=element_text(size=15),
+        legend.title=element_text(size=15))+
+    xlab("Load indices calculated using (normalized)\nmedians for session 2 in both sessions")+
+    ylab("Proportions of the load indices")
+
+# TODO: Add the code for  $\chi^2$ [DoF = 4] = 344.29, $p < .001$)
+
+```
+
+ 
+As we can see, in this case the distribution of load indices for session 1 is skewed towards the lower end (thus indicating that fewer episodes in session 1 were as high a load as the high-load episodes in session 2. This again supports the idea that _session 2 was (overall) higher load than session 1_. 
+
+
+## Summary of results & Conclusions
+
+The results of the different analysis methods outlined above provide us with a very detailed view of how the orchestration of these secondary school geometry lessons took place, from triangulated empirical evidence (both behavioral and subjective).  The two sessions shared similar profiles in terms of high- and low-load episodes: high load episodes tended to be explanations or questioning (or the occasional disciplinary remark) in the class-wide plane, very often looking at the faces of students (in an attempt to assess their progress and understanging). On the other hand, low-load episodes tended to be individual or small-group repairs, with the teacher often focusing on the students paper worksheets or laptops. These similarities across sessions are to be expected given the fact that only the cohorts were different between the lessons, and the rest of the elements (teacher, classroom layout, technologies and subject matter) remained essentially the same.
+
+Our triangulated data sources also helped us find orchestration load differences between these very similar sessions: both the subjective session-level data and eye-tracking metrics confirm a higher difficulty of session 2. The presence of larger differences in the profiles of high- and low-load episodes seems to be a hallmark of sessions that are more difficult to manage. In this particular case, it looks like the presence of more disciplinary remarks and concerns by the teacher was one of the main drivers of this increase in orchestration load (especially, of its frustration component).
+
+These results largely confirm several trends already observed in our previous work using mobile eye-trackers to follow orchestration load: the higher load that class-level interactions pose for teachers, or the fact that assessing student progress across the classroom is also a high-load activity (often represented by looking at the students' faces, in the absence of other glanceable information), or the fact that more marked statistical differences in the high-/low-load episode profiles seem to be correlated with more difficult sessions (as in previous comparisons between a novice and an expert teacher, see Study 3 from our previous [CSCL2015 paper](https://github.com/chili-epfl/cscl2015-eyetracking-orchestration/)). Compared with this previous work to understand classroom orchestration in deeper detail, the method proposed here allows for better explanatory power by adding subjective data about the orchestration load, and also allows for meaningful comparisons among different sessions (of course, at the expense of extra work by the research team).
+
+An issue that might be surprising is the fact that most of the findings about the orchestration load do not seem very related to the technological support in the classroom. This can be partly explained by the fact that the teacher was using her usual set of technologies and setup (thus, in a sense, the technology was `invisible' to her). However, this may not be the case if we were to compare technology-enhanced and traditional versions of a lesson, or two different technologies applied to the same lesson. Also, we should consider that the technology might be playing a more subtle role in the orchestration: the fact that the teacher could not easily access students' progress and understanding may have forced her to fall back to reading it on the students' faces (as all she could see were laptop lids or not-so-glanceable laptop screens); also, the relatively low appearance of the teacher computer as the gaze of focus (where she could access each student's screen through the classroom management software) seem to indicate that the teacher did not see great value in such monitoring feature (as it is implemented), and preferred to roam physically around the classroom.
+
+The orchestration load trends detected by using our approach are largely compatible with much of the existing advice about designing technology for classroom orchestration. However, even if the insights derived from the application of this approach are not (yet) revolutionary, they provide empirical evidence to help technology designers _prioritize_ which orchestration problems to work on first. In this concrete case, the results of our case study support the importance of research efforts in _learning analytics and classroom-level visualizations_, which are important not only in online environments, but also in face-to-face classrooms. 
