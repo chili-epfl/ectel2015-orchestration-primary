@@ -37,8 +37,9 @@ Example video codes | Explanation/Lecturing (EXP), Monitoring (MON), Task distri
 
 First of all, we download the dataset for the study, which has been published in Zenodo ([Dataset for Study (ISL2014BASELINE) MISSING LINK]())
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 require(ggplot2)
+require(gplots)
 require(reshape2)
 require(plyr)
 # We load the useful scripts and packages needed throughout the report
@@ -46,6 +47,8 @@ source("./lib/rollingWindows.R")
 source("./lib/loadIndex.R")
 source("./lib/extremeLoadExtraction.R")
 source("./lib/aggregateEpisodeData.R")
+source("./lib/generateLoadGraphs.R")
+source("./lib/generateVideoSnippetScript.R")
 
 rootdir <- getwd()
 # If not present already, download dataset and uncompress it
@@ -58,12 +61,11 @@ setwd(paste(rootdir,"/data",sep=""))
 We now have all the datafiles uncompressed. This includes mainly a time series of eyetracking data for each of the two sessions, plus an additional set of files with the fixation details and saccade details of each session. There is also another file with the video-codes assigned to a fraction of the of 10-second episodes (those with extreme load indices), as coded by a single human researcher, following the three-dimension video coding scheme mentioned above. The raw gaze video data itself has not been made available due to anonymity reasons. 
 
 
-
 ## 1. From samples to episodes (eyetracking)
 
 Once we have the raw data, we run the first step of the data analysis, calculating the four eyetracking variables of interest (see previous section), over 10-second rolling windows with 5-second slide (see ```./lib/aggregateEpisodeData.R``` and ```./lib/rollingWindows.R``` files for details). With these eye-tracking variables aggregated into 10-second episodes, then we perform a median cut to obtain an estimation of cognitive overload (which we call Load Index), from 0 to 4, for each of those 10-second episodes (see ```./lib/loadIndex.R``` file for details).
 
-```{r, cache=FALSE, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 # We do the preprocessing, which will generate a Rda file with the 10s
 # window data, and will return dataset of episodes and aggregated eyetracking measures
 
@@ -93,7 +95,18 @@ for(session in sessions){
 # Now, loaddata will contain the data to be summarized/visualized
 # We eliminate the NAs
 loaddata <- loaddata[complete.cases(loaddata),]
+```
 
+We can plot the time series for the different eyetracking metrics and the load index, for each of the sessions (see the file ```./lib/generateLoadGraphs.R```:
+
+```{r, message=FALSE, warning=FALSE, fig.height=12, fig.width=16}
+graphs <- plotLoadGraphs(sessions,loaddata)
+multiplot(plotlist=graphs, cols=(length(graphs)/5))
+```
+
+We can also see how the different load indices are distributed in each session (with this load index calculated on the basis of the respective session's median for each measure):
+
+```{r, message=FALSE, warning=FALSE}
 # We do a basic histogram of the amount episodes regarding their Load Index of each session, 
 # using its session median to perform the cut (and normalized by the number of episodes in each session)
 loadtabSelf <- table(loaddata$Load, loaddata$Session)
@@ -115,15 +128,51 @@ ggplot(countsDataSelf,aes(x=Load,y=value/num.Episodes,fill=Session))+
     ylab("Proportions of the load indices")
 ```
 
-As we can see, in both sessions the distribution of load indices is approximately gaussian (which is to be expected,
-given the way such index is calculated with respect to the session median for each eye-tracking metric).
+As we can see, in both sessions the distribution of load indices is approximately gaussian (which is to be expected, given the way such index is calculated with respect to the session median for each eye-tracking metric).
 
 
+## 2. Subjective episode analysis (stimulated recall)
+
+From the time series of 10-second episodes (and their associated load index) generated in the previous step, 20 were selected from sustained high-/low-load periods. The subjective video feed from the teacher's eyetracker for each of these episodes was extracted from the whole-session gaze replay videos, as exported using BeGaze software (using the files ```ISL2014BASELINE-stimulatedrecall-snippetselection.csv``` and ```./lib/generateVideoSnippetScript.R```):
+
+```{r}
+# This assumes the videos are placed in the same location as the dataset
+# generateVideoSnippetScript(timesFile=paste(rootdir,"/data/ISL2014BASELINE-stimulatedrecall-snippetselection.csv",sep=""),videoDir=".")
+# Then, the generated script (extractSnippets.sh) has to be executed to generate the small video files for each selected episode
+```
+
+Then, in a post-hoc interview, the teacher was asked to watch the videos and rate her mental effort (from 1-9) in each of these 20 episodes and provide a rationale for each value (which was audio-recorded and then coded manually by a single researcher (see the ```ISL2014BASELINE-stimulatedrecall-audiocoding.csv``` datafile). We then triangulated the teacher's subjective ratings with the load indices computed from the eye-tracking data for each of those 20 episodes:
+
+```{r}
+# We merge the subjective and eyetracking load data, and plot the confidence intervals
+subjdata <- read.csv(paste(rootdir,"/data/ISL2014BASELINE-stimulatedrecall-ratings.csv",sep=""))
+eyedata <- read.csv(paste(rootdir,"/data/ISL2014BASELINE-stimulatedrecall-snippetselection.csv",sep=""))
+data <- merge(subjdata,eyedata,by=c("Session","Snippet"))
+plotmeans(Subjective.Value ~ Load, data=data)
+
+# We check the significance of this difference
+# TODO: Ask Kshitij about this one
+```
+
+Thus, we found that the _teacher's subjective ratings were significantly lower for the low load episodes_ than those for the high load episodes. This supports the idea that the teacher's notions of her own cognitive load coincide somehow with the physiological data from eye-tracking.
+
+We can also look at the qualitative analysis of remarks done by the teacher during this think-aloud protocol (see the ```ISL2014BASELINE-stimulatedrecall-audiocoding.csv``` datafile):
+
+```{r}
+audiocoding <- read.csv(paste(rootdir,"/data/ISL2014BASELINE-stimulatedrecall-audiocoding.csv",sep=""),sep=";")
+# TODO: How to show clearly code counts of multiple codes per episode?
+```
+
+Thus, we can see that in the higher-load episodes (both subjective and based on eye-tracking) teacher often mentions attempts to model students' understanding, or the need to take a decision about what would be the best immediate course of action. On the other hand, in lower-load episodes (from subjective rating and eye-tracking index), the individual explanations after a student error (what we could term `repairs'), and the technical details or problems in using the technological tools appear more often. Interestingly, the need to make the lesson progress according to plan (i.e., be within the time/curriculum constraints) appears very often in high-load moments, but also appears in low-load ones (maybe indicating a background concern at all times, even in the lower-load moments).
 
 
+## 3. Objective episode analysis (video coding)
 
 
-### Summary of results
+## 4. Session-level analysis
+
+
+## Summary of results
 
 TODO 
 
