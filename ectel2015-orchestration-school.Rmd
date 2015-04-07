@@ -134,9 +134,13 @@ ggplot(countsDataSelf,aes(x=Load,y=value/num.Episodes,fill=Session))+
         legend.title=element_text(size=15))+
     xlab("Load indices calculated using \nmedians for respective sessions")+
     ylab("Proportions of the load indices")
+
+# We check whether the two session distributions are significantly different
+chisq.test(loadtabSelf)
+
 ```
 
-As we can see, in both sessions the distribution of load indices is approximately gaussian (which is to be expected, given the way such index is calculated with respect to the session median for each eye-tracking metric).
+As we can see, in both sessions the distribution of load indices is approximately gaussian (which is to be expected, given the way such index is calculated with respect to the session median for each eye-tracking metric), and that they are not significantly different.
 
 
 ## 2. Subjective episode analysis (stimulated recall)
@@ -350,20 +354,28 @@ The qualitative (open) responses about self-perceived high-load episodes were al
 To triangulate this perception with more objective data, we can also look at the eye-tracking measures. If we apply the median values of the four eye-tracking measures of interest (after normalization by the first 10-second episode of each session, to account for variability in the data due to the different time of the day or wakefulness of the teacher in the concerned days) of session 2 to the data in session 1, we can obtain a quantitative approximation to the relative difficulty between the two sessions. 
 
 ```{r, message=FALSE, warning=FALSE}
-# TODO: Recalculate the load index with different median
+# This dataframe will contain the data with the added Load Index data, calculated with the (normalized) median values of session 2
+loaddata2 <- data.frame()
+
+# We calculate the load index, considering normalized median of session 2 values for the median cut
+loaddata2 <- calculateLoadIndexOtherSessionNormalized(eyetrackdata, refsession="ISL2014BASELINE-Session2-eyetracking", meanlabel="value.Mean", sdlabel="value.SD", fixlabel="value.Fix", saclabel="value.Sac")
+
+# Now, loaddata will contain the data to be summarized/visualized
+# We eliminate the NAs
+loaddata2 <- loaddata2[complete.cases(loaddata2),]
 
 # We do a basic histogram of the amount episodes regarding their Load Index of each session, 
 # using its session median to perform the cut (and normalized by the number of episodes in each session)
-loadtabSelf <- table(loaddata$Load, loaddata$Session)
-countsDataSelf <- melt(loadtabSelf, varnames=c("Load","Session"))
-countsDataSelf$num.Episodes <- numeric(nrow(countsDataSelf))
+loadtabSelf2 <- table(loaddata2$Load, loaddata2$Session)
+countsDataSelf2 <- melt(loadtabSelf2, varnames=c("Load","Session"))
+countsDataSelf2$num.Episodes <- numeric(nrow(countsDataSelf2))
 for(session in sessions){
-     countsDataSelf[countsDataSelf$Session == session,"num.Episodes"] <- sum(countsDataSelf[countsDataSelf$Session == session , "value"])
+     countsDataSelf2[countsDataSelf2$Session == session,"num.Episodes"] <- sum(countsDataSelf2[countsDataSelf2$Session == session , "value"])
 }
 # We change the values of the session to something shorter, for aesthetic reasons
-countsDataSelf$Session <- mapvalues(countsDataSelf$Session, from = sessions, to = c("Session 1", "Session 2"))
+countsDataSelf2$Session <- mapvalues(countsDataSelf2$Session, from = sessions, to = c("Session 1", "Session 2"))
 # We draw the plot of count proportions for the load index
-ggplot(countsDataSelf,aes(x=Load,y=value/num.Episodes,fill=Session))+
+ggplot(countsDataSelf2,aes(x=Load,y=value/num.Episodes,fill=Session))+
     geom_bar(stat="identity",position="dodge")+
     theme(axis.text=element_text(size=15),
         axis.title=element_text(size=15),
@@ -372,8 +384,8 @@ ggplot(countsDataSelf,aes(x=Load,y=value/num.Episodes,fill=Session))+
     xlab("Load indices calculated using (normalized)\nmedians for session 2 in both sessions")+
     ylab("Proportions of the load indices")
 
-# TODO: Add the code for  $\chi^2$ [DoF = 4] = 344.29, $p < .001$)
-
+# We check whether the two session distributions are significantly different
+chisq.test(loadtabSelf2)
 ```
 
  
