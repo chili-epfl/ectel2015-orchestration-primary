@@ -23,6 +23,8 @@ Later on, the data from the eye-tracker was exported (using SMI's BeGaze softwar
 
 From these "extreme load episodes", a subset of 20 episodes was selected (from spans of sustained high- or low-load), and a post-hoc stimulated recall interview was conducted with the teacher. In the interview, the teacher rated these selected episodes in a subjective 1-9 scale for mental effort, using a think-aloud protocol to explain the rationale of her subjective ratings. The audio from this think-aloud protocol was semi-transcribed (only the spans of interesting information were transcribed) and open coded by a single researcher.
 
+_Note : Neither the subjective video feed recorded during the lesson, or the audio file from the think-aloud protocol are provided within this dataset, for anonymity reasons._
+
 # Detailed data structure
 
 Below we describe briefly the format of the data files composing the dataset:
@@ -121,11 +123,9 @@ Comma-separated value file (separator=",", with headers). This is the export of 
 
 Comma-separated value file (separator=",", with headers), with the video codes assigned to different 10-second episodes by a single researcher/coder, along three main dimensions (only one code from each dimensions is assigned to an episode):
 
-_TODO: revise the concrete video codes that appear_
-
 Orchestration dimension | Teacher activity | Social plane | Main gaze focus
 ------------------------|------------------|--------------|----------------
-Example codes | Explanation/Lecturing (EXP), Monitoring (MON), Task distribution or transition (TDT), Technical or conceptual repairs, i.e., solving student questions (REP) | Individual (IND), Small group (GRP), Class-wide (CLS) | Students’ faces (FAC) or backs (BAK), Tabletop surface (TAB), Teacher desk with manipulatives to distribute (MD), Classroom's whiteboard (W), Additional researchers/facilitators (RES), Single paper manipulatives not on the tabletop (M)
+Example codes | Explanation/Lecturing (EXP), Monitoring (MON), Task distribution or transition (TDT), Technical or conceptual repairs, i.e., solving student questions (REP), Questioning students (QUE), Disciplinary remarks (DISC) | Individual (IND), Small group (GRP), Class-wide (CLS) | Students’ faces (FAC), Students' laptops (LAP), Student paper worksheets (PAP), Teacher's computer (TCOMP)
 
 The file has the following fields:
 
@@ -133,6 +133,67 @@ The file has the following fields:
 * Time.min : timestamp, in minutes/seconds, marking the middle-point of the episode (e.g., "2m50s")
 * Session : session identifier ( ISL2014BASELINE-Session1-eyetracking | ISL2014BASELINE-Session2-eyetracking )
 * Short.description : short qualitative description of what is going on during the episode (character)
-* Activity : code along the teacher activity dimension ( EXP | MON | TDT | REP )
+* Activity : code along the teacher activity dimension ( EXP | MON | TDT | REP | QUE | DISC )
 * Social : code along the social plane of interaction dimension ( IND | CLS | GRP )
-* Focus : code along the main focus of gaze dimension ( FAC | TAB | BAK | RES | MD | W | M )
+* Focus : code along the main focus of gaze dimension ( FAC | LAP | PAP | TCOMP )
+
+## ISL2014BASELINE-stimulatedrecall-snippetselection.csv (in ISL2014BASELINE-CodingData.zip)
+
+Comma-separated value file (separator=",", with headers), with the selection of 10-second episodes to be later rated subjectively by the teacher (by looking at a snippet of the subjective video feed from the lesson's recording), in terms of mental effort. These episodes were manually selected from sustained streaks of high- and low-load (as determined by eyetracking measures). 
+
+The file has the following fields:
+
+* Session : session identifier ( ISL2014BASELINE-Session1-eyetracking | ISL2014BASELINE-Session2-eyetracking )
+* Window.Center : Point in time (in milliseconds) at the center of the concerned 10-second episode, taken from the subjective teacher video feed of the lesson (number)
+* Load : Cognitive load index of the teacher during the concerned episode (calculated from eyetracking measures) (number, 0 - 4)
+* Snippet : sequence number of this episode, which will be part of the snippet video filename (number)
+
+## ISL2014BASELINE-stimulatedrecall-audiocoding.csv (in ISL2014BASELINE-CodingData.zip)
+
+Comma-separated value file (separator=";", with headers), with the semi-transcription of the think-aloud process by the teacher (i.e., transcription of only the relevant parts of the audio that relate to the subjective rating) when assessing subjectively the mental effort taken in a selection of 10-second episodes (by looking at a snippet of the subjective video feed from the lesson's recording). This file also includes the qualitative open coding done by a single researcher, on the basis of such transcription, and the subjective and eye-tracking load for each such episodes. 
+
+The file has the following fields:
+
+* Snippet : sequence number of the snippet (see above) (number)
+* Subj.Load: subjective rating of the episode provided by the teacher in terms of mental effort (number, 1-9)
+* Interview.Time : Point in time, within the interview audio recording, where the remarks regarding this episode were made (character, XmYYs)
+* Semi-transcript : Semi-transcription of the rationale of the subjective mental effort rating (character)
+* Codes : Open coding of the semi-transcription of the rationale of the subjective mental effort rating (character, comma-separated)
+* Eyetrack.Load : Load index of the episode, as calculated from eye-tracking measures (number, 0 - 4)
+* Eyetrack.Time : Point in time (in milliseconds) at the center of the concerned 10-second episode, taken from the subjective teacher video feed of the lesson (number)
+* Session : session identifier ( ISL2014BASELINE-Session1-eyetracking | ISL2014BASELINE-Session2-eyetracking )
+
+## ISL2014BASELINE-stimulatedrecall-ratings.csv (in ISL2014BASELINE-QuestionnaireData.zip)
+
+Comma-separated value file (separator=",", with headers), with the subjective rating of mental effort provided by the teacher during the stimulated recall interview, of a selection of 10-second episodes (by looking at a snippet of the subjective video feed from the lesson's recording). 
+
+The file has the following fields:
+
+* Session : session identifier ( ISL2014BASELINE-Session1-eyetracking | ISL2014BASELINE-Session2-eyetracking )
+* Snippet : sequence number of the snippet (see above) (number)
+* Subjective.Value: subjective rating of the episode provided by the teacher in terms of mental effort (number, 1-9)
+
+## ISL2014BASELINE-sessionratings.csv (in ISL2014BASELINE-QuestionnaireData.zip)
+
+Comma-separated value file (separator=";", with headers), with the session-level subjective ratings for mental effort provided by the teacher just after each session. It includes both the responses to the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) instrument, as well as an additional custom questionnaire with open and closed questions about the mental effort of the session.
+
+The file has the following fields:
+
+* Session : session identifier ( ISL2014BASELINE-Session1-eyetracking | ISL2014BASELINE-Session2-eyetracking )
+* Value.Mental.Demand : value of mental demand workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Value.Physical.Demand : value of physical demand workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Value.Temporal.Demand : value of temporal demand workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Value.Performance : value of performance workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Value.Effort : value of effort workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Value.Frustration : value of frustration workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Importance.Mental.Demand : importance of mental demand workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 5)
+* Importance.Physical.Demand : importance of physical demand workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 5)
+* Importance.Temporal.Demand : importance of temporal demand workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 5)
+* Importance.Performance : importance of performance workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 5)
+* Importance.Effort : importance of effort workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 5)
+* Importance.Frustration : importance of frustration workload, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 5)
+* TLX.Total : Overall workload score, as per the [NASA TLX](http://humansystems.arc.nasa.gov/groups/tlx/) questionnaire (number, 0 - 100)
+* Subj.Mental.Effort : subjective rating of overall mental effort of the session (number, 1 - 9)
+* Subj.Difficulty : subjective rating of overall difficulty of the session (number, 1 - 9)
+* Especially.Difficult : response to the open question, 'Do you recall any specific episodes during the lesson which you found especially difficult or requiring more effort than the rest? Please describe them and why you found them difficult.' (character)
+* Especially.Easy : response to the open question, 'Do you recall any specific episodes during the lesson which you found especially easy or requiring less effort than the rest? Please describe them and why you found them easy' (character)
